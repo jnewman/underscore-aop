@@ -1,0 +1,12 @@
+[submodule "test/vendor/mocha"]
+	path = test/vendor/mocha
+	url = https://github.com/visionmedia/mocha.git
+[submodule "test/vendor/chai"]
+	path = test/vendor/chai
+	url = https://github.com/chaijs/chai.git
+[submodule "src/vendor/lodash"]
+	path = src/vendor/lodash
+	url = https://github.com/bestiejs/lodash.git
+[submodule "src/vendor/underscore"]
+	path = src/vendor/underscore
+	url = https://github.com/documentcloud/underscore.git
