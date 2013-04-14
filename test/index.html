@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="vendor/mocha/mocha.css" />
+        <meta charset="utf-8" />
+        <title>Mocha as Promised Tests</title>
+        <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
     </head>
     <body>
-        <div id="mocha"></div>
-        <script src="/test/vendor/mocha/mocha.js"></script>
-        <script src="/test/vendor/chai/chai.js"></script>
-        <script>
-            var expect = chai.expect;
+    <div id="mocha"></div>
 
-            mocha.setup({
-                ui: 'bdd',
-                ignoreLeaks: true
+    <script src="../node_modules/q/q.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/mocha-as-promised/mocha-as-promised.js"></script>
+    <script>
+        mocha.setup('bdd');
+
+        describe("A simple browser test", function () {
+            it("should pass", function () {
+                return Q.resolve(5);
             });
+            it("should fail", function () {
+                return Q.reject(new Error("good, it failed!"));
+            });
+        });
 
-            onload = function () {
-                mocha.run();
-            };
-        </script>
-        <script src="/src/aop.js"></script> <!-- Include source -->
-        <script src="/test/spec.js"></script>
+        mocha.run();
+    </script>
     </body>
 </html>
