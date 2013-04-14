@@ -32,7 +32,7 @@ describe('Undescore AOP', function () {
         tested = new Tested();
     });
 
-    it('should pass', function () {
+    it('Can wrap a single method.', function () {
         tested.setId(99);
 
         var handle = aop.around(tested, 'getId', function (orig) {
