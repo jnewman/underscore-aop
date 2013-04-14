@@ -1,6 +1,3 @@
-[submodule "test/vendor/mocha"]
-	path = test/vendor/mocha
-	url = https://github.com/visionmedia/mocha.git
-[submodule "test/vendor/chai"]
-	path = test/vendor/chai
-	url = https://github.com/chaijs/chai.git
+[submodule "contrib/usejs"]
+	path = contrib/usejs
+	url = git@github.com:jnewman/use.js.git
