@@ -1,4 +1,5 @@
 define(['lodash'], function (_) {
+    'use strict';
     return {
         around: function (obj, methodName, advise) {
             var origMethod = obj[methodName];

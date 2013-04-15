@@ -28,12 +28,14 @@ require([
     _,
     mocha
 ) {
+    'use strict';
     _.noConflict();
 
     mocha.ui('bdd');
     mocha.reporter('html');
 
-    var runner = typeof mochaPhantomJS !== 'undefined' ? mochaPhantomJS : mocha;
+    var runner = typeof window !== 'undefined' && window.mochaPhantomJS ?
+        window.mochaPhantomJS : mocha;
 
     require(['test-underscore-aop'], _.bind(runner.run, runner));
 });

@@ -1,4 +1,6 @@
 define(function (require) {
+    'use strict';
+
     require('mocha');
     var chai = require('chai');
     var assert = chai.assert;

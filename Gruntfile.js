@@ -1,4 +1,5 @@
 module.exports = function (grunt) {
+    'use strict';
 
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -25,15 +26,7 @@ module.exports = function (grunt) {
         },
         jshint: {
             files: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
-            options: {
-                // options here to override JSHint defaults
-                globals: {
-                    jQuery: true,
-                    console: true,
-                    module: true,
-                    document: true
-                }
-            }
+            options: grunt.file.readJSON('.jshintrc')
         },
         mocha_phantomjs: {
             all: ['test/**/*.html']
@@ -41,7 +34,8 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= pkg.name %>' +
+                    '<%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
             dist: {
                 files: {
