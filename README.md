@@ -30,6 +30,8 @@ This is a work in progress... YMMV
 
 Objectives
 ==========
+I'm hoping to achieve/accomplish:
+
  - Provide before, after, around support that doesn't fork when `_.bind` has been called.
  - Work in any environment.
  - Provide reasonable performance.
