@@ -1,6 +1,6 @@
 /**
  * @license
- * Underscore-AOP 0.1.0
+ * Underscore-AOP 0.1.1
  *
  * Available under BSD3 license <https://github.com/jnewman/underscore-aop/blob/master/LICENSE.txt>
  */
