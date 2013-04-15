@@ -1,4 +1,62 @@
-define(['lodash'], function (_) {
+/**
+ * @license
+ * Underscore-AOP 0.1.0
+ *
+ * Available under BSD3 license <https://github.com/jnewman/underscore-aop/blob/master/LICENSE.txt>
+ */
+(function (factory) {
+    'use strict';
+    var amd = typeof define === 'function' && define.amd;
+    /** Detect free variable `exports` */
+    var freeExports = typeof exports == 'object' && exports;
+
+    /** Detect free variable `module` */
+    var freeModule = typeof module == 'object' && module && module.exports == freeExports && module;
+
+    var findUnderscoreLike = function () {
+        var underscoreLike;
+        try {
+            underscoreLike = require('underscore');
+        }
+        catch (e) {
+            try {
+                underscoreLike = require('lodash');
+            } catch (e) {
+                underscoreLike = window._;
+            }
+        }
+
+        if (typeof underscoreLike !== 'function')  {
+            throw new TypeError('underscoreLike function not found.');
+        }
+
+        return underscoreLike;
+    };
+
+    var exported = null;
+    if (amd) {
+        define(function () {
+            return factory(findUnderscoreLike());
+        });
+    }
+    else if (freeExports && !freeExports.nodeType) {
+        exported = factory(findUnderscoreLike());
+        // in Node.js or RingoJS v0.8.0+
+        if (freeModule) {
+            (freeModule.exports = exported).aop = exported;
+        }
+        // in Narwhal or RingoJS v0.7.0-
+        else {
+            freeExports.aop = exported;
+        }
+    }
+    else {
+        var _ = findUnderscoreLike();
+        _.aop = factory(_);
+    }
+
+
+})(function (_) {
     'use strict';
     var nextId = 0;
 

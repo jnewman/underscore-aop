@@ -1,9 +1,9 @@
 {
-    "name": "underscore-aop",
-    "version": "0.0.1",
+    "name": "Underscore-AOP",
+    "version": "0.1.0",
     "licenses": [
         {
-            "type": "BASv2",
+            "type": "BSD3",
             "url": "https://github.com/jnewman/underscore-aop/blob/master/LICENSE.txt"
         }
     ],

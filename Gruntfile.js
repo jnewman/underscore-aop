@@ -35,8 +35,14 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= pkg.version %> ' +
-                    'built on: <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: [
+                    '/**',
+                    ' * @license',
+                    ' * <%= pkg.name %> <%= pkg.version %> <%= pkg.licenses[0].url %>',
+                    ' * Build time: <%= grunt.template.today("yyyy-mm-ddTHH:mm:ss") %>',
+                    ' * Fork of: dojo/aspect.js 1.8.3 http://dojotoolkit.org/license',
+                    ' */\n;'
+                ].join('\n')
             },
             dist: {
                 files: {
