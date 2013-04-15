@@ -1,6 +1,7 @@
 module.exports = function (grunt) {
     'use strict';
 
+    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -34,8 +35,8 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %>' +
-                    '<%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= pkg.version %> ' +
+                    'built on: <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
             dist: {
                 files: {
@@ -46,4 +47,5 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('test', ['jshint', 'mocha_phantomjs']);
+    grunt.registerTask('dist', ['concat', 'uglify']);
 };
