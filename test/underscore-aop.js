@@ -108,7 +108,7 @@ define([
                 handles.push(aop.after(subject, 'sum', afterSum));
             }
 
-            assert.equal(subject.sum(1, 1), 2 + ITERS);
+            assert.equal(subject.sum(1, 1), 2 + NUM_ASPECTS);
             _.invoke(handles, 'remove');
             assert.equal(subject.sum(1, 1), 2);
         });
