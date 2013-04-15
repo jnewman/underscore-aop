@@ -173,15 +173,19 @@
 
     aspect('before')(_, 'bind', function (func) {
         var args = _.toArray(arguments);
-        // Keep a reference to the original function, so we can call it.
-        func._unboundPointer = func._unboundPointer || func;
-
-        args[0] = function () {
-            var dispatcher = _.find(this, function (value, key) {
-                return value._unboundPointer && value._unboundPointer === func;
-            });
+        var advisor = args[0] = function advisor () {
+            var cache = advisor.cache = advisor.cache || {};
+            var dispatcher = cache[func];
+            if (!dispatcher) {
+                dispatcher = cache[func] = _.find(this, function (value) {
+                    return value._unboundPointer && value._unboundPointer === func;
+                });
+            }
             return (dispatcher || func).apply(this, arguments);
         };
+
+        // Keep a reference to the original function, so we can find it later.
+        advisor._unboundPointer = func._unboundPointer = func._unboundPointer || func;
         return args;
     });
 

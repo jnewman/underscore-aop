@@ -125,5 +125,34 @@ define([
             handle.remove();
             assert.equal(getId(), 0);
         });
+
+        it('reliably looks up a method in the cache', function () {
+            var getId = _.bind(subject.getId, subject);
+
+            aop.after(subject, 'getId', function (id) {
+                return id + 1;
+            });
+            assert.equal(getId(), 1);
+
+            aop.after(subject, 'getId', function (id) {
+                return id + 1;
+            });
+            assert.equal(getId(), 2);
+
+            aop.after(subject, 'getId', function (id) {
+                return id + 1;
+            });
+            assert.equal(getId(), 3);
+
+            aop.after(subject, 'getId', function (id) {
+                return id + 1;
+            });
+            assert.equal(getId(), 4);
+
+            aop.after(subject, 'getId', function (id) {
+                return id + 1;
+            });
+            assert.equal(getId(), 5);
+        });
     });
 });
