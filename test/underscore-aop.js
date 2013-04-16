@@ -9,9 +9,14 @@ define([
 ) {
     'use strict';
     var assert = chai.assert;
+    var ASPECT_ITERATIONS = 100;
+    // NOTE: chromium tends to overflow at ~10000, so exceed, but not so much that the test
+    // takes forever..
+    var LARGER_THAN_STACK = 12000;
 
     describe('underscore-aop', function () {
         var subject = null;
+        var descendant = null;
 
         beforeEach(function () {
             function Subject (props) {
@@ -44,10 +49,15 @@ define([
             });
 
             subject = new Subject();
+
+            function Descendant () {}
+            Descendant.prototype = new Subject();
+            descendant = new Descendant();
         });
 
         afterEach(function () {
             subject = null;
+            descendant = null;
         });
 
         it('can wrap a method', function () {
@@ -91,10 +101,7 @@ define([
 
         // Around is exempt from this.
         // TODO: See if I can get this test to run in a reasonable amount of time.
-        it.skip('does not crash when aspecting the same method many times', function () {
-            // NOTE: chromium tends to overflow at ~10000, so massively exceeding.
-            var NUM_ASPECTS = 20000;
-
+        it('does not crash when aspecting the same method many times', function () {
             assert.equal(subject.sum(1, 1), 2);
             var afterSum = function (total) {
                 return total + 1;
@@ -103,12 +110,12 @@ define([
             var handles = [];
             var i = 0;
 
-            while (i++ < NUM_ASPECTS) {
+            while (i++ < LARGER_THAN_STACK) {
                 //noinspection JSHint
                 handles.push(aop.after(subject, 'sum', afterSum));
             }
 
-            assert.equal(subject.sum(1, 1), 2 + NUM_ASPECTS);
+            assert.equal(subject.sum(1, 1), 2 + LARGER_THAN_STACK);
             _.invoke(handles, 'remove');
             assert.equal(subject.sum(1, 1), 2);
         });
@@ -126,29 +133,86 @@ define([
             assert.equal(getId(), 0);
         });
 
+        // TODO: Code that follows needs to be DRYed up.
         it('reliably looks up a method in the cache', function () {
             var getId = _.bind(subject.getId, subject);
 
+            var assertAspectIncrements = function (shouldBe) {
+                aop.after(subject, 'getId', function (id) {
+                    return id + 1;
+                });
+                assert.equal(getId(), shouldBe);
+            };
+
+            var i = 0;
+            while (i < ASPECT_ITERATIONS) {
+                // Initial should be 1, since 0 + 1.
+                assertAspectIncrements(++i);
+            }
+        });
+
+        it('finds methods in the cache even if they\'re bound many times', function () {
+            // Initial bind, just cause.
+            var getId = _.bind(subject.getId, subject);
+
+            var assertBindThenAspectIncrements = function (shouldBe) {
+                getId = _.bind(subject.getId, subject);
+                aop.after(subject, 'getId', function (id) {
+                    return id + 1;
+                });
+                assert.equal(getId(), shouldBe);
+            };
+
+            var i = 0;
+            while (i < ASPECT_ITERATIONS) {
+                assertBindThenAspectIncrements(++i);
+            }
+        });
+
+        it('doesn\'t care if the method is inherited', function () {
+            var getId = _.bind(descendant.getId, descendant);
+            var assertBindThenAspectIncrements = function (shouldBe) {
+                getId = _.bind(descendant.getId, descendant);
+                aop.after(descendant, 'getId', function (id) {
+                    return id + 1;
+                });
+
+                assert.equal(getId(), shouldBe);
+            };
+
+            // IDs start one higher for the descendant.
+            var i = 1;
+            while (i < (ASPECT_ITERATIONS + 1)) {
+                assertBindThenAspectIncrements(++i);
+            }
+        });
+
+        it('finds methods in the cache even if they\'re bound many times', function () {
+            var getId = _.bind(subject.getId, subject);
             aop.after(subject, 'getId', function (id) {
                 return id + 1;
             });
             assert.equal(getId(), 1);
 
+            getId = _.bind(subject.getId, subject);
             aop.after(subject, 'getId', function (id) {
                 return id + 1;
             });
             assert.equal(getId(), 2);
 
+            getId = _.bind(subject.getId, subject);
             aop.after(subject, 'getId', function (id) {
                 return id + 1;
             });
             assert.equal(getId(), 3);
 
+            getId = _.bind(subject.getId, subject);
             aop.after(subject, 'getId', function (id) {
                 return id + 1;
             });
             assert.equal(getId(), 4);
 
+            getId = _.bind(subject.getId, subject);
             aop.after(subject, 'getId', function (id) {
                 return id + 1;
             });

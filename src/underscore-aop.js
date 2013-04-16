@@ -58,6 +58,21 @@
 
 })(function (_) {
     'use strict';
+
+    // 4 char generator.
+    // See: http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+    function createS4 () {
+        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    }
+
+    /**
+     * @returns {string} A guid.
+     */
+    function createGuid () {
+        return createS4() + createS4() + '-' + createS4() + '-' + createS4() + '-' +
+            createS4() + '-' + createS4() + createS4() + createS4();
+    }
+
     var nextId = 0;
 
     function advise (dispatcher, type, advice, receiveArguments) {
@@ -162,7 +177,8 @@
                         return existing.apply(target, args);
                     }};
                 }
-                dispatcher._unboundPointer = existing;
+                // Tag the disatcher as a reference.
+                dispatcher._uaopGuid = existing._uaopGuid;
                 dispatcher.target = target;
             }
             var results = advise((dispatcher || existing), type, advice, receiveArguments);
@@ -171,21 +187,42 @@
         };
     }
 
+    var cache = {};
+    function findDeep (object, test) {
+        var key = '', value;
+        for (key in object) {
+            //noinspection JSUnfilteredForInLoop
+            value = object[key];
+            //noinspection JSUnfilteredForInLoop
+            if (!!test(value, key, object)) {
+                return value;
+            }
+        }
+        return null;
+    }
+    function getDispatcher (originalFunc, context) {
+        //noinspection UnnecessaryLocalVariableJS
+        var dispatcher = cache[originalFunc._uaopGuid] = findDeep(context, function (value) {
+            return !!value && value._uaopGuid === originalFunc._uaopGuid;
+        });
+
+        return dispatcher;
+    }
+
     aspect('before')(_, 'bind', function (func) {
         var args = _.toArray(arguments);
+        var uuid = func._uaopGuid;
+        if (!uuid) {
+            uuid = func._uaopGuid = createGuid();
+            cache[uuid] = func;
+        }
+
         var advisor = args[0] = function advisor () {
-            var cache = advisor.cache = advisor.cache || {};
-            var dispatcher = cache[func];
-            if (!dispatcher) {
-                dispatcher = cache[func] = _.find(this, function (value) {
-                    return value._unboundPointer && value._unboundPointer === func;
-                });
-            }
-            return (dispatcher || func).apply(this, arguments);
+            return (getDispatcher(func, this) || func).apply(this, arguments);
         };
 
         // Keep a reference to the original function, so we can find it later.
-        advisor._unboundPointer = func._unboundPointer = func._unboundPointer || func;
+        advisor._uaopGuid = uuid;
         return args;
     });
 
