@@ -40,12 +40,13 @@ Helping Out
 ===========
 If you want to help out, feel free to file pull requests.
 
-To run the tests, ensure you have a recent version of [NodeJs|http://nodejs.org/download/] (>=0.8).
-Then, do:
+To run the tests, ensure you have a recent version of [NodeJs](http://nodejs.org/download/) (>=0.8).
+Then, do:  
+
     git clone --recursive /path/to/your/fork # recursive matters here, since I'm using submodules.
     cd underscore-aop
     npm install # npm comes w/ recent versions of node.
     npm test # You should see some green lights.
 
 Please, ensure all current tests run and any new features have reasonable tests. (Checkout
-[coverjs-gold|https://github.com/keeyip/CoverJS] if you're interested in this sorta thing.)
+[coverjs-gold](https://github.com/keeyip/CoverJS) if you're interested in this sorta thing.)
