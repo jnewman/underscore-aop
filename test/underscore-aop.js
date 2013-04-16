@@ -133,7 +133,6 @@ define([
             assert.equal(getId(), 0);
         });
 
-        // TODO: Code that follows needs to be DRYed up.
         it('reliably looks up a method in the cache', function () {
             var getId = _.bind(subject.getId, subject);
 
@@ -185,38 +184,6 @@ define([
             while (i < (ASPECT_ITERATIONS + 1)) {
                 assertBindThenAspectIncrements(++i);
             }
-        });
-
-        it('finds methods in the cache even if they\'re bound many times', function () {
-            var getId = _.bind(subject.getId, subject);
-            aop.after(subject, 'getId', function (id) {
-                return id + 1;
-            });
-            assert.equal(getId(), 1);
-
-            getId = _.bind(subject.getId, subject);
-            aop.after(subject, 'getId', function (id) {
-                return id + 1;
-            });
-            assert.equal(getId(), 2);
-
-            getId = _.bind(subject.getId, subject);
-            aop.after(subject, 'getId', function (id) {
-                return id + 1;
-            });
-            assert.equal(getId(), 3);
-
-            getId = _.bind(subject.getId, subject);
-            aop.after(subject, 'getId', function (id) {
-                return id + 1;
-            });
-            assert.equal(getId(), 4);
-
-            getId = _.bind(subject.getId, subject);
-            aop.after(subject, 'getId', function (id) {
-                return id + 1;
-            });
-            assert.equal(getId(), 5);
         });
     });
 });
