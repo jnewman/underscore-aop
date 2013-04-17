@@ -41,7 +41,7 @@ Helping Out
 ===========
 If you want to help out, feel free to file pull requests.
 
-To run the tests, ensure you have a recent version of [NodeJs](http://nodejs.org/download/) (>=0.8).
+To run the tests, ensure you have a recent version of [NodeJS](http://nodejs.org/download/) (>=0.8).
 Then, do:  
 
     git clone --recursive /path/to/your/fork # recursive matters for submodules.
