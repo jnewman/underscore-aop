@@ -59,21 +59,9 @@
 })(function (_) {
     'use strict';
 
-    // 4 char generator.
-    // See: http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-    function createS4 () {
-        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-    }
-
-    /**
-     * @returns {string} A guid.
-     */
-    function createGuid () {
-        return createS4() + createS4() + '-' + createS4() + '-' + createS4() + '-' +
-            createS4() + '-' + createS4() + createS4() + createS4();
-    }
-
-    var nextId = 0;
+    var dispatchers = {};
+    var dispatcherId = 0;
+    var advisorId = 0;
 
     function advise (dispatcher, type, advice, receiveArguments) {
         var previous = dispatcher[type];
@@ -112,7 +100,7 @@
                         }
                     }
                 },
-                id: nextId++,
+                id: advisorId++,
                 advice: advice,
                 receiveArguments: receiveArguments
             };
@@ -160,7 +148,7 @@
                     // after advice
                     var after = dispatcher.after;
                     var newResults;
-                    while (after && after.id < nextId) {
+                    while (after && after.id < advisorId) {
                         if (after.receiveArguments) {
                             newResults = after.advice.apply(this, args);
                             // change the return value only if a new value was returned
@@ -178,7 +166,8 @@
                     }};
                 }
                 // Tag the disatcher as a reference.
-                dispatcher._uaopGuid = existing._uaopGuid;
+                dispatcher._uaopId = existing._uaopId;
+                dispatchers[dispatcher._uaopId] = dispatcher;
                 dispatcher.target = target;
             }
             var results = advise((dispatcher || existing), type, advice, receiveArguments);
@@ -187,54 +176,40 @@
         };
     }
 
-    var cache = {};
-    function findDeep (object, test) {
-        var key = '', value;
-        for (key in object) {
-            //noinspection JSUnfilteredForInLoop
-            value = object[key];
-            //noinspection JSUnfilteredForInLoop
-            if (!!test(value, key, object)) {
-                return value;
-            }
-        }
-        return null;
-    }
-    function getDispatcher (originalFunc, context) {
-        //noinspection UnnecessaryLocalVariableJS
-        var dispatcher = cache[originalFunc._uaopGuid] = findDeep(context, function (value) {
-            return !!value && value._uaopGuid === originalFunc._uaopGuid;
-        });
-
-        return dispatcher;
-    }
-
     aspect('before')(_, 'bind', function (func) {
         var args = _.toArray(arguments);
-        var uuid = func._uaopGuid;
-        if (!uuid) {
-            uuid = func._uaopGuid = createGuid();
-            cache[uuid] = func;
+        var id = func._uaopId;
+        if (!id) {
+            id = func._uaopId = dispatcherId++;
         }
 
         var advisor = args[0] = function advisor () {
-            return (getDispatcher(func, this) || func).apply(this, arguments);
+            return (dispatchers[id] || func).apply(this, arguments);
         };
 
         // Keep a reference to the original function, so we can find it later.
-        advisor._uaopGuid = uuid;
+        advisor._uaopId = id;
         return args;
     });
 
-    // Leave the API open to either apsect(type, )
-    return _.extend(function (type) {
-        return aspect(type).apply(this, arguments);
-    }, {
 
+    var slice = Array.prototype.slice;
+    /**
+     *
+     * @param {string} type
+     * @param {...} args
+     * @returns {*}
+     */
+    var unTypedAspect = function (type, args) {
+        args = slice.call(arguments, 1);
+        return aspect(type).apply(this, args);
+    };
+
+    var methods = {
         /**
          * @param {Object} target
          * @param {string} methodName
-         * @param {Function.<Array|Arguments|undefined>} advice
+         * @param {Function.<Function>} advise
          * @return {Object.<{remove: Function, advice: Function}>}
          */
         before: aspect('before'),
@@ -242,7 +217,7 @@
         /**
          * @param {Object} target
          * @param {string} methodName
-         * @param {Function.<Array|Arguments|undefined>} advice
+         * @param {Function.<Function>} advise
          * @return {Object.<{remove: Function, advice: Function}>}
          */
         around: aspect('around'),
@@ -250,9 +225,17 @@
         /**
          * @param {Object} target
          * @param {string} methodName
-         * @param {Function.<Function>} advice
+         * @param {Function.<Function>} advise
          * @return {Object.<{remove: Function, advice: Function}>}
          */
         after: aspect('after')
-    });
+    };
+
+    for (var name in methods) {
+        if (methods.hasOwnProperty(name)) {
+            unTypedAspect[name] = methods[name];
+        }
+    }
+
+    return unTypedAspect;
 });
