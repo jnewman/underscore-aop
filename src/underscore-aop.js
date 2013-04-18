@@ -59,13 +59,14 @@
 })(function (_) {
     'use strict';
 
+    var slice = Array.prototype.slice;
     var dispatchers = {};
     var dispatcherId = 0;
     var advisorId = 0;
 
     function advise (dispatcher, type, advice, receiveArguments) {
         var previous = dispatcher[type];
-        var around = type == 'around';
+        var around = type === 'around';
         var signal;
         if (around) {
             var advised = advice(function () {
@@ -176,8 +177,9 @@
         };
     }
 
+    // Wrap _.bind, so we can find the right method later.
     aspect('before')(_, 'bind', function (func) {
-        var args = _.toArray(arguments);
+        var args = slice.call(arguments, 0);
         var id = func._uaopId;
         if (!id) {
             id = func._uaopId = dispatcherId++;
@@ -192,17 +194,13 @@
         return args;
     });
 
-
-    var slice = Array.prototype.slice;
     /**
-     *
-     * @param {string} type
-     * @param {...} args
-     * @returns {*}
+     * @param {string} type E.g., before.
+     * @param {...} args Depends on type. See methods below.
+     * @returns {Object.<{remove: Function, advice: Function}>}
      */
     var unTypedAspect = function (type, args) {
-        args = slice.call(arguments, 1);
-        return aspect(type).apply(this, args);
+        return aspect(type).apply(this, slice.call(arguments, 1));
     };
 
     var methods = {
@@ -231,11 +229,15 @@
         after: aspect('after')
     };
 
-    for (var name in methods) {
-        if (methods.hasOwnProperty(name)) {
-            unTypedAspect[name] = methods[name];
+    // Save some cycles by only taking one src.
+    var mixin = function (target, src) {
+        for (var name in src) {
+            if (src.hasOwnProperty(name)) {
+                target[name] = src[name];
+            }
         }
-    }
+        return target;
+    };
 
-    return unTypedAspect;
+    return mixin(unTypedAspect, methods);
 });
