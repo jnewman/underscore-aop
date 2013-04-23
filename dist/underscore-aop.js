@@ -1,6 +1,6 @@
 /**
  * @license
- * Underscore-AOP 0.3.1
+ * Underscore-AOP 0.3.3
  *
  * Available under BSD3 license <https://github.com/jnewman/underscore-aop/blob/master/LICENSE.txt>
  */
@@ -75,6 +75,8 @@
             signal = {
                 remove: function () {
                     signal.cancelled = true;
+                    // Keep the cache clean
+                    delete dispatchers[dispatcher._uaopId];
                 },
                 advice: function (target, args) {
                     return signal.cancelled ?
@@ -90,6 +92,8 @@
                     var next = signal.next;
                     if (!next && !previous) {
                         delete dispatcher[type];
+                        // Keep the cache clean
+                        delete dispatchers[dispatcher._uaopId];
                     } else {
                         if (previous) {
                             previous.next = next;
@@ -167,8 +171,12 @@
                     }};
                 }
                 // Tag the disatcher as a reference.
-                dispatcher._uaopId = existing._uaopId;
-                dispatchers[dispatcher._uaopId] = dispatcher;
+                dispatcher._uaopId = existing._uaopId ?
+                    existing._uaopId :
+                    existing._uaopId = dispatcherId++;
+                if (dispatcher._uaopId) {
+                    dispatchers[dispatcher._uaopId] = dispatcher;
+                }
                 dispatcher.target = target;
             }
             var results = advise((dispatcher || existing), type, advice, receiveArguments);
@@ -226,7 +234,9 @@
          * @param {Function.<Function>} advise
          * @return {Object.<{remove: Function, advice: Function}>}
          */
-        after: aspect('after')
+        after: aspect('after'),
+
+        _dispatchers: dispatchers
     };
 
     // Save some cycles by only taking one src.
