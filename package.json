@@ -1,12 +1,24 @@
 {
     "name": "underscore-aop",
     "version": "0.3.3",
+    "description": "A fork of dojo/aspect that works w/ underscore-like libraries.",
+    "author": "Joshua Newman <joshua.l.newman@gmail.com>",
+    "keywords": [
+        "aspect",
+        "underscore",
+        "lodash"
+    ],
     "licenses": [
         {
             "type": "BSD3",
             "url": "https://github.com/jnewman/underscore-aop/blob/master/LICENSE.txt"
         }
     ],
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:jnewman/underscore-aop.git"
+    },
+    "main": "./dist/underscore-aop",
     "scripts": {
         "dist": "grunt dist",
         "lint": "grunt jshint",

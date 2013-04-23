@@ -205,7 +205,6 @@ define([
                 delete noopB._uaopId;
             }
 
-            console.info(aop._dispatchers);
             assert.equal(_.size(aop._dispatchers), originalSize);
         });
     });

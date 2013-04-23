@@ -6,7 +6,7 @@ require({
         'underscore': '../node_modules/underscore/underscore',
         'underscore-aop': '../src/underscore-aop',
         'use': '../contrib/usejs/use',
-        'test-underscore-aop': '../test/underscore-aop'
+        'test-underscore-aop': './underscore-aop'
     },
 
     use: {
