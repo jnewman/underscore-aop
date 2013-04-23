@@ -45,7 +45,9 @@ define([
                     return _.reduce(arguments, function (total, current) {
                         return total + Number(current);
                     }, 0);
-                }
+                },
+
+                other: function () {}
             });
 
             subject = new Subject();
@@ -184,6 +186,27 @@ define([
             while (i < (ASPECT_ITERATIONS + 1)) {
                 assertBindThenAspectIncrements(++i);
             }
+        });
+
+        it('cleans up after itself', function () {
+            var i = 0,
+                originalSize = _.size(aop._dispatchers),
+                aopMethod = '',
+                genMethod = '',
+                handle = null,
+                noopA = function () {},
+                noopB = function () {};
+
+            while (i++ < ASPECT_ITERATIONS) {
+                descendant[(genMethod = 'other' + String(i))] = noopB;
+                aopMethod = i % 3 === 0 ? 'after' : i % 2 === 0 ? 'before' : 'around';
+                handle = aop[aopMethod](descendant, genMethod, noopA);
+                handle.remove();
+                delete noopB._uaopId;
+            }
+
+            console.info(aop._dispatchers);
+            assert.equal(_.size(aop._dispatchers), originalSize);
         });
     });
 });
