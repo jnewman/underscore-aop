@@ -1,3 +1,0 @@
-[submodule "contrib/usejs"]
-	path = contrib/usejs
-	url = git@github.com:jnewman/use.js.git

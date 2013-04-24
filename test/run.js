@@ -5,16 +5,15 @@ require({
         'mocha': '../node_modules/mocha/mocha',
         'underscore': '../node_modules/underscore/underscore',
         'underscore-aop': '../src/underscore-aop',
-        'use': '../contrib/usejs/use',
         'test-underscore-aop': './underscore-aop'
     },
 
-    use: {
+    shim: {
         mocha: {
-            attach: 'mocha'
+            exports: 'mocha'
         },
         underscore: {
-            attach: '_'
+            exports: '_'
         }
     }
 });
@@ -22,7 +21,7 @@ require({
 require([
     'require',
     'lodash',
-    'use!mocha'
+    'mocha'
 ], function (
     require,
     _,
