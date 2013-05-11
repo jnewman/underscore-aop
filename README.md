@@ -1,6 +1,6 @@
 # Underscore-AOP
 
-An aop library that's compatible w/ underscore.js and lodash.js
+An aop library that's compatible w/ the context bindings underscore.js and lodash.js.
 
 Overview
 ========
@@ -37,12 +37,19 @@ I'm hoping to achieve/accomplish:
  - Provide support for _almost_ any environment.
  - Provide reasonable performance.
 
+TODO
+====
+There are still some missing features and ugliness, but I'm working on it...
+ - Verify support for bindAll.
+ - Tidy up the code.
+ - Add performance testing.
+
 Helping Out
 ===========
 If you want to help out, feel free to file pull requests.
 
 To run the tests, ensure you have a recent version of [NodeJS](http://nodejs.org/download/) (>=0.8).
-Then, do:  
+Then, do:
 
     git clone --recursive /path/to/your/fork # recursive matters for submodules.
     cd underscore-aop

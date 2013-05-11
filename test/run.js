@@ -15,6 +15,10 @@ require({
         underscore: {
             exports: '_'
         }
+    },
+
+    uaop: {
+        undescoreMid: 'underscore'
     }
 });
 

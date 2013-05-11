@@ -1,10 +1,10 @@
 define([
     'mocha', 'chai',
-    'lodash',
+    'lodash', 'underscore',
     'underscore-aop'
 ], function (
     mocha, chai,
-    _,
+    lodash, underscore,
     aop
 ) {
     'use strict';
@@ -18,18 +18,23 @@ define([
         var subject = null;
         var descendant = null;
 
+        before(function () {
+            aop.wrapLib(lodash);
+            aop.wrapLib(underscore);
+        });
+
         beforeEach(function () {
             function Subject (props) {
-                _.extend(this, props);
+                lodash.extend(this, props);
                 this._cid = Subject.prototype._cidCounter++;
             }
 
-            _.extend(Subject.prototype, {
+            lodash.extend(Subject.prototype, {
                 idAttr: 'id',
                 _cidCounter: 0,
                 getId: function () {
                     var realId = this[this.idAttr];
-                    return !_.isUndefined(realId) ? realId : this._cid;
+                    return !lodash.isUndefined(realId) ? realId : this._cid;
                 },
                 setId: function (id) {
                     this[this.idAttr] = id;
@@ -42,7 +47,7 @@ define([
                  */
                 sum: function (number) {
                     //noinspection JSValidateTypes
-                    return _.reduce(arguments, function (total, current) {
+                    return lodash.reduce(arguments, function (total, current) {
                         return total + Number(current);
                     }, 0);
                 },
@@ -80,7 +85,7 @@ define([
         it('can inject functionality before a method is executed', function () {
             assert.equal(subject.sum(1, 1), 2);
             var handle = aop.before(subject, 'sum', function (number) {
-                var args = _.toArray(arguments);
+                var args = lodash.toArray(arguments);
                 args[0]++;
                 return args;
             });
@@ -118,79 +123,97 @@ define([
             }
 
             assert.equal(subject.sum(1, 1), 2 + LARGER_THAN_STACK);
-            _.invoke(handles, 'remove');
+            lodash.invoke(handles, 'remove');
             assert.equal(subject.sum(1, 1), 2);
         });
 
         it('aspects a bound method', function () {
-            var getId = _.bind(subject.getId, subject);
-            assert.equal(subject.getId(), 0);
+            var byLib = function (lib) {
+                var getId = lib.bind(subject.getId, subject);
+                assert.equal(subject.getId(), 0);
 
-            var handle = aop.after(subject, 'getId', function (id) {
-                return id + 1;
-            });
+                var handle = aop.after(subject, 'getId', function (id) {
+                    return id + 1;
+                });
 
-            assert.equal(getId(), 1);
-            handle.remove();
-            assert.equal(getId(), 0);
+                assert.equal(getId(), 1);
+                handle.remove();
+                assert.equal(getId(), 0);
+            };
+            lodash.forEach([underscore, lodash], byLib);
         });
 
         it('reliably looks up a method in the cache', function () {
-            var getId = _.bind(subject.getId, subject);
+            var byLib = function (lib) {
+                var ogid = subject.getId;
+                var getId = lib.bind(subject.getId, subject);
 
-            var assertAspectIncrements = function (shouldBe) {
-                aop.after(subject, 'getId', function (id) {
-                    return id + 1;
-                });
-                assert.equal(getId(), shouldBe);
+                var assertAspectIncrements = function (shouldBe) {
+                    aop.after(subject, 'getId', function (id) {
+                        return id + 1;
+                    });
+                    assert.equal(getId(), shouldBe);
+                };
+
+                var i = 0;
+                while (i < ASPECT_ITERATIONS) {
+                    // Initial should be 1, since 0 + 1.
+                    assertAspectIncrements(++i);
+                }
+                subject.getId = ogid;
             };
-
-            var i = 0;
-            while (i < ASPECT_ITERATIONS) {
-                // Initial should be 1, since 0 + 1.
-                assertAspectIncrements(++i);
-            }
+            lodash.forEach([underscore, lodash], byLib);
         });
 
         it('finds methods in the cache even if they\'re bound many times', function () {
-            // Initial bind, just cause.
-            var getId = _.bind(subject.getId, subject);
+            var byLib = function (lib) {
+                var ogid = subject.getId;
+                // Initial bind, just cause.
+                var getId = lib.bind(subject.getId, subject);
 
-            var assertBindThenAspectIncrements = function (shouldBe) {
-                getId = _.bind(subject.getId, subject);
-                aop.after(subject, 'getId', function (id) {
-                    return id + 1;
-                });
-                assert.equal(getId(), shouldBe);
+                var assertBindThenAspectIncrements = function (shouldBe) {
+                    getId = lib.bind(subject.getId, subject);
+                    aop.after(subject, 'getId', function (id) {
+                        return id + 1;
+                    });
+                    assert.equal(getId(), shouldBe);
+                };
+
+                var i = 0;
+                while (i < ASPECT_ITERATIONS) {
+                    assertBindThenAspectIncrements(++i);
+                }
+                subject.getId = ogid;
             };
-
-            var i = 0;
-            while (i < ASPECT_ITERATIONS) {
-                assertBindThenAspectIncrements(++i);
-            }
+            lodash.forEach([underscore, lodash], byLib);
         });
 
         it('doesn\'t care if the method is inherited', function () {
-            var getId = _.bind(descendant.getId, descendant);
-            var assertBindThenAspectIncrements = function (shouldBe) {
-                getId = _.bind(descendant.getId, descendant);
-                aop.after(descendant, 'getId', function (id) {
-                    return id + 1;
-                });
+            var byLib = function (lib) {
+                var ogid = descendant.getId;
+                var getId = lib.bind(descendant.getId, descendant);
+                var assertBindThenAspectIncrements = function (shouldBe) {
+                    getId = lib.bind(descendant.getId, descendant);
+                    aop.after(descendant, 'getId', function (id) {
+                        return id + 1;
+                    });
 
-                assert.equal(getId(), shouldBe);
+                    assert.equal(getId(), shouldBe);
+                };
+
+                // IDs start one higher for the descendant.
+                var i = 1;
+                while (i < (ASPECT_ITERATIONS + 1)) {
+                    assertBindThenAspectIncrements(++i);
+                }
+                descendant.getId = ogid;
             };
-
-            // IDs start one higher for the descendant.
-            var i = 1;
-            while (i < (ASPECT_ITERATIONS + 1)) {
-                assertBindThenAspectIncrements(++i);
-            }
+            lodash.forEach([underscore, lodash], byLib);
         });
 
         it('cleans up after itself', function () {
             var i = 0,
-                originalSize = _.size(aop._dispatchers),
+                originalSize = lodash.size(aop._dispatchers),
                 aopMethod = '',
                 genMethod = '',
                 handle = null,
@@ -205,7 +228,7 @@ define([
                 delete noopB._uaopId;
             }
 
-            assert.equal(_.size(aop._dispatchers), originalSize);
+            assert.equal(lodash.size(aop._dispatchers), originalSize);
         });
     });
 });

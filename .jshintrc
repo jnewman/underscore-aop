@@ -7,7 +7,7 @@
     "maxcomplexity": 10,
     "maxdepth": 6,
     "maxlen": 100,
-    "maxparams": 4,
+    "maxparams": 100,
     "maxstatements": 40,
     "node": true,
     "newcap": true,
