@@ -1,6 +1,6 @@
 /**
  * @license
- * Underscore-AOP 0.3.3
+ * Underscore-AOP
  *
  * Available under BSD3 license <https://github.com/jnewman/underscore-aop/blob/master/LICENSE.txt>
  */
@@ -35,7 +35,7 @@
 
     var exported = null;
     if (amd) {
-        define(function () {
+        define(['underscore'], function () {
             return factory(findUnderscoreLike());
         });
     }
@@ -54,8 +54,6 @@
         var _ = findUnderscoreLike();
         _.aop = factory(_);
     }
-
-
 })(function (_) {
     'use strict';
 
@@ -185,27 +183,32 @@
         };
     }
 
-    // Wrap _.bind, so we can find the right method later.
-    aspect('before')(_, 'bind', function (func) {
-        var args = slice.call(arguments, 0);
-        var id = func._uaopId;
-        if (!id) {
-            id = func._uaopId = dispatcherId++;
-        }
+    var bindHandles = [];
+    var wrapBind = function (lib) {
+        // Wrap _.bind, so we can find the right method later.
+        var handle = aspect('before')(lib, 'bind', function (func) {
+            var args = slice.call(arguments, 0);
+            var id = func._uaopId;
+            if (!id) {
+                id = func._uaopId = dispatcherId++;
+            }
 
-        var advisor = args[0] = function advisor () {
-            return (dispatchers[id] || func).apply(this, arguments);
-        };
+            var advisor = args[0] = function advisor () {
+                return (dispatchers[id] || func).apply(this, arguments);
+            };
 
-        // Keep a reference to the original function, so we can find it later.
-        advisor._uaopId = id;
-        return args;
-    });
+            // Keep a reference to the original function, so we can find it later.
+            advisor._uaopId = id;
+            return args;
+        });
+        bindHandles.push(handle);
+        return handle;
+    };
 
     /**
      * @param {string} type E.g., before.
      * @param {...} args Depends on type. See methods below.
-     * @returns {Object.<{remove: Function, advice: Function}>}
+     * @returnss {Object.<{remove: Function, advice: Function}>}
      */
     var unTypedAspect = function (type, args) {
         return aspect(type).apply(this, slice.call(arguments, 1));
@@ -216,7 +219,7 @@
          * @param {Object} target
          * @param {string} methodName
          * @param {Function.<Function>} advise
-         * @return {Object.<{remove: Function, advice: Function}>}
+         * @returns {Object.<{remove: Function, advice: Function}>}
          */
         before: aspect('before'),
 
@@ -224,7 +227,7 @@
          * @param {Object} target
          * @param {string} methodName
          * @param {Function.<Function>} advise
-         * @return {Object.<{remove: Function, advice: Function}>}
+         * @returns {Object.<{remove: Function, advice: Function}>}
          */
         around: aspect('around'),
 
@@ -232,9 +235,20 @@
          * @param {Object} target
          * @param {string} methodName
          * @param {Function.<Function>} advise
-         * @return {Object.<{remove: Function, advice: Function}>}
+         * @returns {Object.<{remove: Function, advice: Function}>}
          */
         after: aspect('after'),
+
+        /**
+         * Wraps the bind method of another library. The lib must work like underscore and methods
+         * cannot be bound by more than one lib, otherwise the stack gets lost.
+         *
+         * @param {Function} lib A library that works like underscore or lodash.
+         * @returns {{remove: Function}} A remover in cas ethe library needs to be unwrapped.
+         */
+        wrapLib: function (lib) {
+            return wrapBind(lib);
+        },
 
         _dispatchers: dispatchers
     };
