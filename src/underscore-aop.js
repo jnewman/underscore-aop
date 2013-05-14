@@ -4,7 +4,7 @@
  *
  * Available under BSD3 license <https://github.com/jnewman/underscore-aop/blob/master/LICENSE.txt>
  */
-(function (factory) {
+(function (factory, global) {
     'use strict';
     var amd = typeof define === 'function' && define.amd;
     /** Detect free variable `exports` */
@@ -22,7 +22,7 @@
             try {
                 underscoreLike = require('lodash');
             } catch (e) {
-                underscoreLike = window._;
+                underscoreLike = global._;
             }
         }
 
@@ -264,4 +264,4 @@
     };
 
     return mixin(unTypedAspect, methods);
-});
+}, this);
