@@ -4,13 +4,13 @@
  *
  * Available under BSD3 license <https://github.com/jnewman/underscore-aop/blob/master/LICENSE.txt>
  */
+//noinspection ThisExpressionReferencesGlobalObjectJS
 (function (factory, global) {
     'use strict';
     var amd = typeof define === 'function' && define.amd;
-    /** Detect free variable `exports` */
-    var freeExports = typeof exports == 'object' && exports;
 
-    /** Detect free variable `module` */
+    // Determine if we're running server side.
+    var freeExports = typeof exports == 'object' && exports;
     var freeModule = typeof module == 'object' && module && module.exports == freeExports && module;
 
     var findUnderscoreLike = function () {
