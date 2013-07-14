@@ -1,13 +1,28 @@
 module.exports = function (grunt) {
     'use strict';
 
+    grunt.loadNpmTasks('grunt-benchmark');
+
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+
     grunt.loadNpmTasks('grunt-mocha-phantomjs');
+    grunt.loadNpmTasks('grunt-mocha-test');
 
     grunt.initConfig({
+        benchmark: {
+            all: {
+                // Skip sub folders, so I can keep helpers around.
+                src: ['perf/*.js'],
+                dest: 'perf/samples.csv'
+            },
+            options: {
+                // This can also be set inside specific tests.
+                displayResults: true
+            }
+        },
         concat: {
             options: {
                 separator: ';'
@@ -29,7 +44,17 @@ module.exports = function (grunt) {
             files: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
             options: grunt.file.readJSON('.jshintrc')
         },
-        mocha_phantomjs: {
+        mochaTest: {
+            test: {
+                options: {
+                    reporter: 'spec'
+                },
+                src: [
+                    'test/*-node.js'
+                ]
+            }
+        },
+        'mocha_phantomjs': {
             all: ['test/**/*.html']
         },
         pkg: grunt.file.readJSON('package.json'),
@@ -52,6 +77,7 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('test', ['jshint', 'mocha_phantomjs']);
-    grunt.registerTask('dist', ['concat', 'uglify']);
+    grunt.registerTask('perf', ['benchmark:all']);
+    grunt.registerTask('test', ['jshint', 'mocha_phantomjs', 'mochaTest']);
+    grunt.registerTask('dist', ['concat', 'uglify', 'test']);
 };

@@ -1,0 +1,11 @@
+language: node_js
+
+node_js:
+  - "0.8"
+  - "0.10"
+
+before_script:
+  npm run-script dist
+
+notifications:
+  email: "joshua.l.newman+underscore-aop@gmail.com"

@@ -2,6 +2,10 @@
 
 An aop library that's compatible w/ the context bindings underscore.js and lodash.js.
 
+[![Build Status](https://api.travis-ci.org/jnewman/underscore-aop.png?branch=master)](https://travis-ci.org/jnewman/underscore-aop)
+
+[![Browser Support](https://ci.testling.com/jnewman/underscore-aop.png)](https://ci.testling.com/jnewman/underscore-aop)
+
 Overview
 ========
 A lot of people use Aspect Oriented Programming (AOP) in JS. It's often called monkey-patching and
@@ -37,13 +41,6 @@ I'm hoping to achieve/accomplish:
  - Provide support for _almost_ any environment.
  - Provide reasonable performance.
 
-TODO
-====
-There are still some missing features and ugliness, but I'm working on it...
- - Verify support for bindAll.
- - Tidy up the code.
- - Add performance testing.
-
 Helping Out
 ===========
 If you want to help out, feel free to file pull requests.
@@ -51,7 +48,7 @@ If you want to help out, feel free to file pull requests.
 To run the tests, ensure you have a recent version of [NodeJS](http://nodejs.org/download/) (>=0.8).
 Then, do:
 
-    git clone --recursive /path/to/your/fork # recursive matters for submodules.
+    git clone /path/to/your/fork
     cd underscore-aop
     npm install # npm comes w/ recent versions of node.
     npm test # Should pass.
