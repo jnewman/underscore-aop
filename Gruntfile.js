@@ -1,15 +1,12 @@
 module.exports = function (grunt) {
     'use strict';
 
-    grunt.loadNpmTasks('grunt-benchmark');
+    var pjson = grunt.file.readJSON('package.json');
 
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-connect');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-
-    grunt.loadNpmTasks('grunt-mocha-phantomjs');
-    grunt.loadNpmTasks('grunt-mocha-test');
+    var _ = require('lodash');
+    _.filter(_.keys(pjson.devDependencies), function (key) {
+        return (/^grunt-/).test(key) && key !== 'grunt-cli';
+    }).forEach(grunt.loadNpmTasks);
 
     grunt.initConfig({
         benchmark: {
@@ -42,7 +39,9 @@ module.exports = function (grunt) {
         },
         jshint: {
             files: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
-            options: grunt.file.readJSON('.jshintrc')
+            options: {
+                jshintrc: '.jshintrc'
+            }
         },
         mochaTest: {
             test: {
@@ -57,7 +56,7 @@ module.exports = function (grunt) {
         'mocha_phantomjs': {
             all: ['test/**/*.html']
         },
-        pkg: grunt.file.readJSON('package.json'),
+        pkg: pjson,
         uglify: {
             options: {
                 banner: [

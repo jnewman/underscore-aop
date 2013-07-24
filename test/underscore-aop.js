@@ -1,6 +1,9 @@
 /*jshint evil:true,maxstatements:10000*/
-exports = typeof exports === 'undefined' ? {} : exports;
-exports.test = function (contextDescription, assert, underscore, lodash, aop) {
+/*globals module:true*/
+
+module = (typeof module === 'object' ? module : {});
+module.exports = typeof exports === 'object' ? exports : {};
+module.exports = function (contextDescription, assert, underscore, lodash, aop) {
     'use strict';
     describe(contextDescription, function () {
         var ASPECT_ITERATIONS = 100;
@@ -14,6 +17,7 @@ exports.test = function (contextDescription, assert, underscore, lodash, aop) {
             var lodashWrap = null;
             var underscoreWrap = null;
             before(function () {
+                aop.unwrapLib();
                 lodashWrap = aop.wrapLib(lodash);
                 underscoreWrap = aop.wrapLib(underscore);
             });
@@ -230,6 +234,22 @@ exports.test = function (contextDescription, assert, underscore, lodash, aop) {
                 }
 
                 assert.equal(lodash.size(aop._dispatchers), originalSize);
+            });
+
+            it('handles methods that\'ve used bindAll', function () {
+                lodash.forEach([lodash, underscore], function (_) {
+                    _.bindAll(subject, ['getId']);
+
+                    var handle = aop.around(subject, 'getId', function (orig) {
+                        return function () {
+                            return 42 + orig.call(this);
+                        };
+                    });
+
+                    assert.equal(subject.getId(), 42);
+                    handle.remove();
+                    assert.equal(subject.getId(), 0);
+                });
             });
         });
     });

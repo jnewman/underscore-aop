@@ -4,57 +4,43 @@
  *
  * Available under BSD3 license <https://github.com/jnewman/underscore-aop/blob/master/LICENSE.txt>
  */
-//noinspection ThisExpressionReferencesGlobalObjectJS
-(function (factory, global) {
+(function (root, factory) {
     'use strict';
-    var amd = typeof define === 'function' && define.amd;
-
-    // Determine if we're running server side.
-    var freeExports = typeof exports == 'object' && exports;
-    var freeModule = typeof module == 'object' && module && module.exports == freeExports && module;
-
-    var findUnderscoreLike = function () {
-        var underscoreLike;
+    var _ = (function () {
+        var _;
         try {
-            underscoreLike = require('underscore');
+            _ = require('underscore');
         }
         catch (e) {
             try {
-                underscoreLike = require('lodash');
+                _ = require('lodash');
             } catch (e) {
-                underscoreLike = global._;
+                _ = root._;
             }
         }
 
-        if (typeof underscoreLike !== 'function')  {
+        if (typeof _ !== 'function')  {
             throw new TypeError('underscoreLike function not found.');
         }
 
-        return underscoreLike;
-    };
+        return _;
+    })();
 
-    var exported = null;
-    if (amd) {
-        define(['underscore'], function () {
-            return factory(findUnderscoreLike());
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(function () {
+            return factory(_);
         });
     }
-    else if (freeExports && !freeExports.nodeType) {
-        exported = factory(findUnderscoreLike());
-        // in Node.js or RingoJS v0.8.0+
-        if (freeModule) {
-            (freeModule.exports = exported).aop = exported;
-        }
-        // in Narwhal or RingoJS v0.7.0-
-        else {
-            freeExports.aop = exported;
-        }
+    else if (typeof module === 'object' && !!module.exports) {
+        // CommonJS
+        module.exports = factory(_);
     }
     else {
-        var _ = findUnderscoreLike();
+        // Browser globals
         _.aop = factory(_);
     }
-})(function (_) {
+})(this, function (_) {
     'use strict';
 
     var slice = Array.prototype.slice;
@@ -214,6 +200,8 @@
         return aspect(type).apply(this, slice.call(arguments, 1));
     };
 
+    var remover = wrapBind(_);
+
     var methods = {
         /**
          * @param {Object} target
@@ -250,6 +238,10 @@
             return wrapBind(lib);
         },
 
+        unwrapLib: function () {
+            remover.remove();
+        },
+
         _dispatchers: dispatchers
     };
 
@@ -264,4 +256,4 @@
     };
 
     return mixin(unTypedAspect, methods);
-}, this);
+});

@@ -2,10 +2,10 @@ define(function (require) {
     'use strict';
     var assert = require('chai').assert;
 
-    require('./underscore-aop-test');
+    require('./underscore-aop');
     var aop = require('underscore-aop');
-    exports.test('AMD in browser', assert, require('underscore'), require('lodash'), aop);
+    module.exports('AMD in browser', assert, require('underscore'), require('lodash'), aop);
 
     aop = require('underscore-aop-dist');
-    exports.test('AMD in browser min', assert, require('underscore'), require('lodash'), aop);
+    module.exports('AMD in browser min', assert, require('underscore'), require('lodash'), aop);
 });

@@ -1,6 +1,6 @@
 (function () {
     'use strict';
-    require('./underscore-aop-test').test(
+    require('./underscore-aop')(
         'Require in Node',
         require('chai').assert,
         require('underscore'),
