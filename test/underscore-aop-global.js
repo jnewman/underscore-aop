@@ -1,8 +1,7 @@
+/*globals run:false*/
 define(function (require) {
     'use strict';
-    var assert = require('chai').assert;
-
     require('./underscore-aop');
     var aop = require('underscore-aop');
-    module.exports('Global in browser', assert, require('underscore'), require('lodash'), aop);
+    run('Global in browser', window.expect, require('underscore'), require('lodash'), aop);
 });

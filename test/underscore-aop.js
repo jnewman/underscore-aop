@@ -1,9 +1,9 @@
 /*jshint evil:true,maxstatements:10000*/
-/*globals module:true*/
+/*globals module:true,run:true*/
 
 module = (typeof module === 'object' ? module : {});
 module.exports = typeof exports === 'object' ? exports : {};
-module.exports = function (contextDescription, assert, underscore, lodash, aop) {
+run = module.exports = function (contextDescription, expect, underscore, lodash, aop) {
     'use strict';
     describe(contextDescription, function () {
         var ASPECT_ITERATIONS = 100;
@@ -74,7 +74,7 @@ module.exports = function (contextDescription, assert, underscore, lodash, aop) 
 
             it('can wrap a method', function () {
                 subject.setId(99);
-                assert.equal(subject.getId(), 99);
+                expect(subject.getId()).to.equal(99);
 
                 var handle = aop.around(subject, 'getId', function (orig) {
                     return function () {
@@ -82,39 +82,39 @@ module.exports = function (contextDescription, assert, underscore, lodash, aop) 
                     };
                 });
 
-                assert.equal(subject.getId(), 141);
+                expect(subject.getId()).to.equal(141);
                 handle.remove();
-                assert.equal(subject.getId(), 99);
+                expect(subject.getId()).to.equal(99);
             });
 
             it('can inject functionality before a method is executed', function () {
-                assert.equal(subject.sum(1, 1), 2);
+                expect(subject.sum(1, 1)).to.equal(2);
                 var handle = aop.before(subject, 'sum', function (number) {
                     var args = lodash.toArray(arguments);
                     args[0]++;
                     return args;
                 });
 
-                assert.equal(subject.sum(1, 1), 3);
+                expect(subject.sum(1, 1)).to.equal(3);
                 handle.remove();
-                assert.equal(subject.sum(1, 1), 2);
+                expect(subject.sum(1, 1)).to.equal(2);
             });
 
             it('can inject functionality after a method is executed', function () {
-                assert.equal(subject.sum(1, 1), 2);
+                expect(subject.sum(1, 1)).to.equal(2);
                 var handle = aop.after(subject, 'sum', function (total) {
                     return total + 1;
                 });
 
-                assert.equal(subject.sum(1, 1), 3);
+                expect(subject.sum(1, 1)).to.equal(3);
                 handle.remove();
-                assert.equal(subject.sum(1, 1), 2);
+                expect(subject.sum(1, 1)).to.equal(2);
             });
 
             // Around is exempt from this.
             // TODO: See if I can get this test to run in a reasonable amount of time.
             it('does not crash when aspecting the same method many times', function () {
-                assert.equal(subject.sum(1, 1), 2);
+                expect(subject.sum(1, 1)).to.equal(2);
                 var afterSum = function (total) {
                     return total + 1;
                 };
@@ -127,23 +127,23 @@ module.exports = function (contextDescription, assert, underscore, lodash, aop) 
                     handles.push(aop.after(subject, 'sum', afterSum));
                 }
 
-                assert.equal(subject.sum(1, 1), 2 + LARGER_THAN_STACK);
+                expect(subject.sum(1, 1)).to.equal(2 + LARGER_THAN_STACK);
                 lodash.invoke(handles, 'remove');
-                assert.equal(subject.sum(1, 1), 2);
+                expect(subject.sum(1, 1)).to.equal(2);
             });
 
             it('aspects a bound method', function () {
                 var byLib = function (lib) {
                     var getId = lib.bind(subject.getId, subject);
-                    assert.equal(subject.getId(), 0);
+                    expect(subject.getId()).to.equal(0);
 
                     var handle = aop.after(subject, 'getId', function (id) {
                         return id + 1;
                     });
 
-                    assert.equal(getId(), 1);
+                    expect(getId()).to.equal(1);
                     handle.remove();
-                    assert.equal(getId(), 0);
+                    expect(getId()).to.equal(0);
                 };
                 lodash.forEach([underscore, lodash], byLib);
             });
@@ -157,7 +157,7 @@ module.exports = function (contextDescription, assert, underscore, lodash, aop) 
                         aop.after(subject, 'getId', function (id) {
                             return id + 1;
                         });
-                        assert.equal(getId(), shouldBe);
+                        expect(getId()).to.equal(shouldBe);
                     };
 
                     var i = 0;
@@ -181,7 +181,7 @@ module.exports = function (contextDescription, assert, underscore, lodash, aop) 
                         aop.after(subject, 'getId', function (id) {
                             return id + 1;
                         });
-                        assert.equal(getId(), shouldBe);
+                        expect(getId()).to.equal(shouldBe);
                     };
 
                     var i = 0;
@@ -203,7 +203,7 @@ module.exports = function (contextDescription, assert, underscore, lodash, aop) 
                             return id + 1;
                         });
 
-                        assert.equal(getId(), shouldBe);
+                        expect(getId()).to.equal(shouldBe);
                     };
 
                     // IDs start one higher for the descendant.
@@ -233,7 +233,7 @@ module.exports = function (contextDescription, assert, underscore, lodash, aop) 
                     delete noopB._uaopId;
                 }
 
-                assert.equal(lodash.size(aop._dispatchers), originalSize);
+                expect(lodash.size(aop._dispatchers)).to.equal(originalSize);
             });
 
             it('handles methods that\'ve used bindAll', function () {
@@ -246,9 +246,9 @@ module.exports = function (contextDescription, assert, underscore, lodash, aop) 
                         };
                     });
 
-                    assert.equal(subject.getId(), 42);
+                    expect(subject.getId()).to.equal(42);
                     handle.remove();
-                    assert.equal(subject.getId(), 0);
+                    expect(subject.getId()).to.equal(0);
                 });
             });
         });

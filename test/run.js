@@ -9,7 +9,7 @@
 
     require({
         paths: {
-            chai: '../node_modules/chai/chai',
+            expect: '../bower_components/expect/expect',
             lodash: '../node_modules/lodash/lodash',
             mocha: '../node_modules/mocha/mocha',
             test: '.',
@@ -38,6 +38,8 @@
         var runner = typeof window !== 'undefined' && global.mochaPhantomJS ?
             global.mochaPhantomJS : mocha;
 
-        require(TESTS, _.bind(runner.run, runner));
+        require(TESTS, function() {
+            runner.run();
+        });
     });
 })(this);
