@@ -2,7 +2,7 @@
     'use strict';
     require('./underscore-aop')(
         'Require in Node',
-        require('chai').assert,
+        require('../bower_components/expect/expect'),
         require('underscore'),
         require('lodash'),
         require('../')
