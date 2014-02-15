@@ -4,8 +4,6 @@ An aop library that's compatible w/ the context bindings underscore.js and lodas
 
 [![Build Status](https://api.travis-ci.org/jnewman/underscore-aop.png?branch=master)](https://travis-ci.org/jnewman/underscore-aop)
 
-[![Browser Support](https://ci.testling.com/jnewman/underscore-aop.png)](https://ci.testling.com/jnewman/underscore-aop)
-
 Overview
 ========
 A lot of people use Aspect Oriented Programming (AOP) in JS. It's often called monkey-patching and
