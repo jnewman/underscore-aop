@@ -1,7 +1,7 @@
 {
   "name": "underscore-aop",
   "main": "dist/underscore-aop.js",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "dependencies": {
     "expect": "0.3.1"
   },
