@@ -21,7 +21,7 @@
   },
   "bugs": "https://github.com/jnewman/underscore-aop/issues",
   "scripts": {
-    "dist": "grunt dist",
+    "dist": "bower install && grunt dist",
     "lint": "grunt jshint",
     "perf": "grunt perf",
     "test": "bower install && grunt test"
