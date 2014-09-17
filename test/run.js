@@ -9,7 +9,7 @@
 
     require({
         paths: {
-            expect: '../bower_components/expect/expect',
+            expect: '../bower_components/expect/index',
             lodash: '../node_modules/lodash/lodash',
             mocha: '../node_modules/mocha/mocha',
             test: '.',

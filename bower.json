@@ -1,8 +1,9 @@
 {
   "name": "underscore-aop",
+  "main": "dist/underscore-aop.js",
   "version": "0.5.1",
   "dependencies": {
-    "expect": "0.2.0"
+    "expect": "0.3.1"
   },
   "homepage": "https://github.com/jnewman/underscore-aop",
   "authors": [
