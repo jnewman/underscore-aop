@@ -24,8 +24,7 @@
     "dist": "grunt dist",
     "lint": "grunt jshint",
     "perf": "grunt perf",
-    "postinstall": "bower install",
-    "test": "grunt test"
+    "test": "bower install && grunt test"
   },
   "testling": {
     "browsers": {
