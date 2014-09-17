@@ -1,6 +1,6 @@
 {
   "name": "underscore-aop",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "A fork of dojo/aspect that works w/ underscore-like libraries.",
   "author": "Joshua Newman <joshua.l.newman@gmail.com>",
   "keywords": [
