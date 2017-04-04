@@ -23,7 +23,7 @@ run = module.exports = function (contextDescription, expect, underscore, lodash,
             });
 
             beforeEach(function () {
-                function Subject (props) {
+                function Subject(props) {
                     lodash.extend(this, props);
                     this._cid = Subject.prototype._cidCounter++;
                 }
@@ -51,12 +51,15 @@ run = module.exports = function (contextDescription, expect, underscore, lodash,
                         }, 0);
                     },
 
-                    other: function () {}
+                    other: function () {
+                    }
                 });
 
                 subject = new Subject();
 
-                function Descendant () {}
+                function Descendant() {
+                }
+
                 Descendant.prototype = new Subject();
                 descendant = new Descendant();
             });
@@ -128,7 +131,9 @@ run = module.exports = function (contextDescription, expect, underscore, lodash,
                 }
 
                 expect(subject.sum(1, 1)).to.equal(2 + LARGER_THAN_STACK);
-                lodash.invoke(handles, 'remove');
+                lodash.forEach(handles, function (handle) {
+                    handle.remove();
+                });
                 expect(subject.sum(1, 1)).to.equal(2);
             });
 
@@ -222,8 +227,10 @@ run = module.exports = function (contextDescription, expect, underscore, lodash,
                     aopMethod = '',
                     genMethod = '',
                     handle = null,
-                    noopA = function () {},
-                    noopB = function () {};
+                    noopA = function () {
+                    },
+                    noopB = function () {
+                    };
 
                 while (i++ < ASPECT_ITERATIONS) {
                     descendant[(genMethod = 'other' + String(i))] = noopB;

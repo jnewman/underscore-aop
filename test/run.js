@@ -34,12 +34,12 @@
         mocha.ui('bdd');
         mocha.reporter('html');
 
-        //noinspection JSUnresolvedVariable
-        var runner = typeof window !== 'undefined' && global.mochaPhantomJS ?
-            global.mochaPhantomJS : mocha;
-
         require(TESTS, function() {
-            runner.run();
+            if (typeof global !== 'undefined' && global.initMochaPhantomJS) {
+                global.initMochaPhantomJS();
+            } else {
+                mocha.run();
+            }
         });
     });
-})(this);
+})(this || window);
