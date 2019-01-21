@@ -1,11 +1,10 @@
 language: node_js
 
 node_js:
-  - 6
-  - 7
+  - 11
 
 before_script:
-  npm run-script dist
+  npm run dist
 
 notifications:
   email: "joshua.l.newman+underscore-aop@gmail.com"
