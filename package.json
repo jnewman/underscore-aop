@@ -75,7 +75,7 @@
     "jshint": "^2.9.7",
     "lodash": "^4.17.11",
     "mocha": "^5.2.0",
-    "requirejs": "2.3.3",
+    "requirejs": "2.3.5",
     "underscore": "1.8.3"
   }
 }
