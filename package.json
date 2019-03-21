@@ -69,7 +69,7 @@
     "grunt-contrib-concat": "1.0.1",
     "grunt-contrib-connect": "2.0.0",
     "grunt-contrib-jshint": "2.0.0",
-    "grunt-contrib-uglify": "2.2.1",
+    "grunt-contrib-uglify": "4.0.1",
     "grunt-mocha-phantomjs": "4.0.0",
     "grunt-mocha-test": "0.13.3",
     "jshint": "^2.9.7",
